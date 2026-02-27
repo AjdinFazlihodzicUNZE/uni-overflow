@@ -1,6 +1,6 @@
 @UniOverflow.API_HostAddress = http://localhost:5023
 
-GET {{UniOverflow.API_HostAddress}}/weatherforecast/
+GET {{UniOverflow.API_HostAddress}}/questions/
 Accept: application/json
 
 ###
