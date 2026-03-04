@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 using UniOverflow.API.Data;
 using UniOverflow.API.Models;
@@ -19,11 +20,18 @@ public class QuestionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()
+    public async Task<ActionResult<IEnumerable<Question>>> GetQuestions(string? searchTerm)
     {
-
-        var result = await _appDbContext.Questions.ToListAsync();
-        return Ok(result);
+        
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            var result = await _appDbContext.Questions.ToListAsync();
+            return Ok(result);
+        }else
+        {
+            var result = await _appDbContext.Questions.Where(e => e.Title.Contains(searchTerm)).ToListAsync();
+            return Ok(result);
+        }
     }
     [HttpPost]
     public async Task<ActionResult<Question>> CreateQuestion([FromBody] Question question)
