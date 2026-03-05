@@ -40,29 +40,52 @@ public class QuestionsController : ControllerBase
         return Ok(result);
     }
     [HttpPost]
-    public async Task<ActionResult<Question>> CreateQuestion([FromBody] Question question)
+    public async Task<ActionResult<QuestionResponseDto>> CreateQuestion([FromBody] QuestionCreateDto question)
     {
-        _appDbContext.Questions.Add(question);
+        var newQuestion = new Question
+        {
+            Title = question.Title,
+            Content = question.Content,
+            AuthorName = question.AuthorName,
+        };
+        _appDbContext.Questions.Add(newQuestion);
         await _appDbContext.SaveChangesAsync();
-        return Ok(question);
+        return Ok(new QuestionResponseDto
+        {
+           Id = newQuestion.Id,
+           Title = newQuestion.Title,
+           Content = newQuestion.Content,
+           AuthorName =newQuestion.AuthorName,
+           CreatedAt = newQuestion.CreatedAt
+        });
     }
     [HttpGet("{id}")]
-    public async Task<ActionResult<Question>> GetQuestion(Guid id)
+    public async Task<ActionResult<QuestionResponseDto>> GetQuestion(Guid id)
     {
         var question = await _appDbContext.Questions.FindAsync(id);
         if (question == null) {
             return NotFound();
         }
-        return Ok(question);
+        return Ok(new QuestionResponseDto
+        {
+            Id = question.Id,
+            Title = question.Title,
+            Content = question.Content,
+            AuthorName = question.AuthorName,
+            CreatedAt = question.CreatedAt
+        });
     }
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateQuestion(Guid id, [FromBody] Question question)
+    public async Task<ActionResult> UpdateQuestion(Guid id, [FromBody] QuestionCreateDto updatedQuestion)
     {
-        if (id != question.Id)
+        var existingQuestion = await _appDbContext.Questions.FindAsync(id);
+        if (existingQuestion == null)
         {
-            return BadRequest();
+            return NotFound();
         }
-        _appDbContext.Entry(question).State = EntityState.Modified;
+        existingQuestion.Title = updatedQuestion.Title;
+        existingQuestion.Content = updatedQuestion.Content;
+        existingQuestion.AuthorName = updatedQuestion.AuthorName;
         try
         {
             await _appDbContext.SaveChangesAsync();
@@ -75,7 +98,7 @@ public class QuestionsController : ControllerBase
             }
             throw;
         }
-        return Ok(question);
+        return NoContent();
     }
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteQuestion(Guid id)
