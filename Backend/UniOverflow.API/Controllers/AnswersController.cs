@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Validation;
 using System.Threading.Tasks;
 using UniOverflow.API.Data;
+using UniOverflow.API.DTOs;
 using UniOverflow.API.Models;
 
 namespace UniOverflow.API.Controllers
@@ -16,45 +18,59 @@ namespace UniOverflow.API.Controllers
             _appDbContext = appDbContext;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Answer>>> GetAnswers(Guid questionId)
+        public async Task<ActionResult<IEnumerable<AnswerResponseDto>>> GetAnswers(Guid questionId)
         {
-            var answers = await _appDbContext.Answers
-                .Where(a => a.QuestionId == questionId)
-                .ToListAsync();
+            var answers = await _appDbContext.Answers.Where(a => a.QuestionId == questionId).Select(a => new AnswerResponseDto
+            {
+                Id = a.Id,
+                Content = a.Content,
+                AuthorName = a.AuthorName,
+                CreatedAt = a.CreatedAt,
+                QuestionId = a.QuestionId
+            }).ToListAsync();
+            
             return Ok(answers);
         }
         [HttpPost]
-        [HttpPost]
-        public async Task<ActionResult<Answer>> CreateAnswer(Guid questionId, [FromBody] Answer answer)
+        public async Task<ActionResult<AnswerResponseDto>> CreateAnswer(Guid questionId, [FromBody] AnswerCreateDto answer)
         {
+            var newAnswer = new Answer
+            {
+                Content = answer.Content,
+                AuthorName = answer.AuthorName,
+            };
             var questionExists = await _appDbContext.Questions.AnyAsync(q => q.Id == questionId);
             if (!questionExists)
             {
                 return NotFound("Question doesnt exist");
             }
-            answer.QuestionId = questionId;
+            newAnswer.QuestionId = questionId;
 
-            _appDbContext.Answers.Add(answer);
+            _appDbContext.Answers.Add(newAnswer);
             await _appDbContext.SaveChangesAsync();
 
-            return Ok(answer);
+            return Ok(new AnswerResponseDto
+            {
+                Id = newAnswer.Id,
+                Content = newAnswer.Content,
+                AuthorName = newAnswer.AuthorName,
+                CreatedAt = newAnswer.CreatedAt,
+                QuestionId = newAnswer.QuestionId
+            });
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateAnswer(Guid questionId, Guid id, [FromBody] Answer updatedAnswer)
+        public async Task<ActionResult> UpdateAnswer(Guid questionId, Guid id, [FromBody] AnswerCreateDto updatedAnswer)
         {
-            if (id != updatedAnswer.Id)
+            var existingAnswer = await _appDbContext.Answers.FirstOrDefaultAsync(a => a.Id == id && a.QuestionId == questionId);
+            if (existingAnswer == null)
             {
-                return BadRequest("Answer ID mismatch");
+                return NotFound("Answer not found or he not belong to this question.");
             }
-            if (questionId != updatedAnswer.QuestionId)
-            {
-                return BadRequest("Question ID mismatch");
-            }
+            existingAnswer.Content = updatedAnswer.Content;
+            existingAnswer.AuthorName = updatedAnswer.AuthorName;
 
-            _appDbContext.Entry(updatedAnswer).State = EntityState.Modified;
             await _appDbContext.SaveChangesAsync();
-
-            return Ok(updatedAnswer);
+            return NoContent();
         }
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAnswer(Guid questionId, Guid id)
