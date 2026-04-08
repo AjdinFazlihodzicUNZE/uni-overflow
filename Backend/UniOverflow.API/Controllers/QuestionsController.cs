@@ -10,7 +10,7 @@ namespace UniOverflow.API.Controllers;
 /*Source that helped me: https://github.com/TrackableEntities/AspNetCore.ApiControllers.Templates/blob/master/sample/TemplatesSample/Controllers/ProductsController.cs */
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class QuestionsController : ControllerBase
 {
     private readonly AppDbContext _appDbContext;
