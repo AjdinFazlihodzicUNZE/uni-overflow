@@ -1,11 +1,12 @@
 
 import { Component, signal, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink } from '@angular/router';
 import { ApiService } from './services/api';
 import { Question } from './models/question';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterLink, FormsModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -23,4 +24,32 @@ export class App implements OnInit {
       }
     });
   }
+  newQuestion: Question = {id:'', 
+    title: '', 
+    content: '',
+     authorName: '', 
+    isApproved: false,
+     createdAt: '',
+      answers: []
+  };
+  postQuestion() {
+    this.apiService.postQuestion(this.newQuestion).subscribe({
+      next: (data) => {
+        console.log('Question posted successfully:', data);
+        this.questions.push(data);
+        this.newQuestion = {id:'', 
+        title: '', 
+        content: '',
+          authorName: '',
+          isApproved: false,
+          createdAt: '',
+          answers: []
+          };
+      },
+      error: (err) => {
+        console.error('Error posting question:', err);
+      }
+    });
+  }
+
 }

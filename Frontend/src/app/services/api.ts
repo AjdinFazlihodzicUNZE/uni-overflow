@@ -12,4 +12,7 @@ export class ApiService {
   getQuestions() {
     return this.http.get<Question[]>(`${this.baseUrl}/questions`);
   }
+  postQuestion(question: Question) {
+    return this.http.post<Question>(`${this.baseUrl}/questions`, question);
+  } 
 }

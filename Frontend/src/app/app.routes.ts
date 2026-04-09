@@ -1,3 +1,7 @@
 import { Routes } from '@angular/router';
-
-export const routes: Routes = [];
+import { QuestionDetails } from './question-details/question-details';
+import { Question } from './models/question';
+export const routes: Routes = [
+    {path: 'question/:id', component: QuestionDetails},
+    { path: '**', redirectTo: '' }
+];
