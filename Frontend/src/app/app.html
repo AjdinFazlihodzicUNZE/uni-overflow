@@ -1,14 +1,3 @@
-<form (ngSubmit)="postQuestion()">
-  <input required name="title" [(ngModel)]="newQuestion.title" placeholder="Title" type="text">
-  <input required minlength="20" name="content" [(ngModel)]="newQuestion.content" placeholder="Content" type="text">
-  <input required name="authorName" [(ngModel)]="newQuestion.authorName" placeholder="Author Name" type="text">
-  <button type="submit">Post Question</button>
-</form>
-@for (singleItem of questions; track singleItem.id) {
-  <a [routerLink]="['/question', singleItem.id]">
-    <h2>{{singleItem.title}}</h2>
-  </a>
-  <p>{{singleItem.authorName}}</p>
+<h1>Fakultet Overflow</h1>
 
-  }
 <router-outlet></router-outlet>
