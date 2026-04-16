@@ -3,9 +3,10 @@ import { RouterOutlet, RouterLink } from '@angular/router';
 import { ApiService } from '../services/api';
 import { Question } from '../models/question';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-home',
-  imports: [RouterOutlet, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

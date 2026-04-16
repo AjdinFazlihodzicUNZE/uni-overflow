@@ -15,4 +15,7 @@ export class ApiService {
   postQuestion(question: Question) {
     return this.http.post<Question>(`${this.baseUrl}/questions`, question);
   } 
+  getQuestionById(id: string) {
+    return this.http.get<Question>(`${this.baseUrl}/questions/${id}`);
+  }
 }

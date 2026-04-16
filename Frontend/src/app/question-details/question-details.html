@@ -1,1 +1,9 @@
-<p>question-details works!</p>
+
+@if(currentQuestion) {
+  <h1>Question Details</h1>
+  <h2>{{currentQuestion.title}}</h2>
+  <p><strong>Author:</strong> {{currentQuestion.authorName}}</p>
+  <hr>
+} @else {
+    <p>Loading question details...</p>
+}
